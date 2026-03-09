@@ -68,7 +68,7 @@
       >
         <BusinessContactInfo
           :initialValue="initialContactPoint"
-          :isEditing="isFullRestorationFiling ? true : false"
+          :isEditing="isFullRestorationFiling"
           :showErrors="isFullRestorationFiling ? getShowErrors : false"
           @update="onBusinessContactUpdate($event)"
           @valid="onBusinessContactFormValidityChange($event)"
