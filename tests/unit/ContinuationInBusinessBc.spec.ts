@@ -65,7 +65,7 @@ describe('Continuation In Business BC component', () => {
     vm.onOfficeAddressesValid(true)
     await Vue.nextTick()
 
-    // should remain false since addresses are empty
+    // should become false since addresses are empty
     expect(vm.addressFormValid).toBe(false)
 
     wrapper.destroy()
