@@ -57,6 +57,10 @@ describe('Continuation In Business BC component', () => {
 
     const vm = wrapper.vm as any
 
+    // precondition: simulate a previously valid address form
+    vm.addressFormValid = true
+    expect(vm.addressFormValid).toBe(true)
+
     // simulate OfficeAddresses emitting true with empty addresses
     vm.onOfficeAddressesValid(true)
     await Vue.nextTick()

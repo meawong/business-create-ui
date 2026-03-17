@@ -244,10 +244,9 @@ export default class ContinuationInBusinessBc extends Mixins(CommonMixin) {
 
   onOfficeAddressesValid (valid: boolean): void {
     // OfficeAddresses defaults validity flags to true internally and emits on mount
-    // regardless of data — if addresses are empty we ignore this emission since it
-    // would incorrectly mark the step valid before the user has entered anything
-    if (valid && (this.isEmptyRegisteredAddress || this.isEmptyRecordsAddress)) return
-    this.addressFormValid = valid
+    // regardless of data — ensure empty addresses cannot mark the step valid
+    const hasEmptyRequiredAddress = this.isEmptyRegisteredAddress || this.isEmptyRecordsAddress
+    this.addressFormValid = valid && !hasEmptyRequiredAddress
   }
 
   @Watch('getNameTranslationsValid', { immediate: true })
