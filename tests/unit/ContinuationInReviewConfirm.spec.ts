@@ -156,8 +156,8 @@ describe('Continuation In Review Confirm component', () => {
 
     // spot check some content (structure / text)
     const fourthSection = wrapper.findAll('#continuation-in-review-confirm > section').at(3)
-    expect(fourthSection.find('header h2').text()).toBe('Certify')
-    expect(fourthSection.find('header p').text()).toContain('Certify your authorization to complete and submit')
+    expect(fourthSection.find('header h2').text()).toBe('Authorization')
+    expect(fourthSection.find('header p').text()).toContain('Confirm your authorization to complete and submit')
     expect(fourthSection.findComponent(Certify).exists()).toBe(true)
 
     wrapper.destroy()

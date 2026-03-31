@@ -141,6 +141,7 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
     const filing: AmalgamationFilingIF = {
       header: {
         name: FilingTypes.AMALGAMATION_APPLICATION,
+        certifiedBy: this.isBaseCompany ? undefined : (this.getCertifyState.certifiedBy || undefined),
         date: this.getCurrentDate,
         filingId: this.getFilingId,
         folioNumber: this.getFolioNumber || undefined,

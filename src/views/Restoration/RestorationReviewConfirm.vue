@@ -87,7 +87,18 @@
       id="certify-section"
       class="mt-10"
     >
-      <header>
+      <header
+        v-if="isBaseCompany"
+      >
+        <h2>Authorization</h2>
+        <p class="mt-4">
+          Confirm your authorization to complete and submit this application. The name of the person submitting this
+          filing will be displayed in the history of filings for this {{ getEntityDescription }}.
+        </p>
+      </header>
+      <header
+        v-else
+      >
         <h2>Certify</h2>
         <p
           v-if="isBaseCompany"
@@ -115,7 +126,6 @@
           :invalidSection="isCertifyInvalid"
           :isStaff="IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)"
           :showLegalName="!isBaseCompany"
-          :authorizationMode="certify"
         />
       </v-card>
     </section>
