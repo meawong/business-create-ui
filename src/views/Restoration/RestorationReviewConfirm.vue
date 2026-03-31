@@ -87,7 +87,18 @@
       id="certify-section"
       class="mt-10"
     >
-      <header>
+      <header
+        v-if="isBaseCompany"
+      >
+        <h2>Authorization</h2>
+        <p class="mt-4">
+          Confirm your authorization to complete and submit this application. The name of the person submitting this
+          filing will be displayed in the history of filings for this {{ getEntityDescription }}.
+        </p>
+      </header>
+      <header
+        v-else
+      >
         <h2>Certify</h2>
         <p class="mt-4">
           Confirm the legal name of the person authorized to complete and submit this application.
@@ -104,6 +115,7 @@
           :disableEdit="false"
           :invalidSection="isCertifyInvalid"
           :isStaff="IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)"
+          :showLegalName="!isBaseCompany"
         />
       </v-card>
     </section>
@@ -169,6 +181,7 @@ export default class RestorationReviewConfirm extends Vue {
   @Getter(useStore) getValidateSteps!: boolean
   @Getter(useStore) isFullRestorationFiling!: boolean
   @Getter(useStore) isLimitedRestorationFiling!: boolean
+  @Getter(useStore) isBaseCompany!: boolean
 
   @Action(useStore) setCertifyState!: (x: CertifyIF) => void
 
@@ -191,6 +204,9 @@ export default class RestorationReviewConfirm extends Vue {
 
   /** Is true when the certify conditions are not met. */
   get isCertifyInvalid (): boolean {
+    if (this.isBaseCompany) {
+      return this.getValidateSteps && !this.getCertifyState.valid
+    }
     return this.getValidateSteps && !(this.getCertifyState.certifiedBy && this.getCertifyState.valid)
   }
 }

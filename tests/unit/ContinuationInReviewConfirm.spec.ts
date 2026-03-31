@@ -113,8 +113,16 @@ describe('Continuation In Review Confirm component', () => {
     wrapper.destroy()
   })
 
-  it('renders the component correctly - Certify section', async () => {
-    const wrapper = wrapperFactory(ContinuationInReviewConfirm)
+  it('renders the component correctly - Certify section (non-corp)', async () => {
+    const wrapper = wrapperFactory(
+      ContinuationInReviewConfirm,
+      null,
+      {
+        entityType: 'CP'
+      },
+      null,
+      null
+    )
     await Vue.nextTick()
 
     // verify that component exists
@@ -125,6 +133,31 @@ describe('Continuation In Review Confirm component', () => {
     const fourthSection = wrapper.findAll('#continuation-in-review-confirm > section').at(3)
     expect(fourthSection.find('header h2').text()).toBe('Certify')
     expect(fourthSection.find('header p').text()).toContain('Confirm the legal name of the person authorized')
+    expect(fourthSection.findComponent(Certify).exists()).toBe(true)
+
+    wrapper.destroy()
+  })
+
+  it('renders the component correctly - Authorization section (corp)', async () => {
+    const wrapper = wrapperFactory(
+      ContinuationInReviewConfirm,
+      null,
+      {
+        entityType: 'C'
+      },
+      null,
+      ContinuationInResources
+    )
+    await Vue.nextTick()
+
+    // verify that component exists
+    expect(wrapper.findComponent(ContinuationInReviewConfirm).exists()).toBe(true)
+    expect(wrapper.find('#continuation-in-review-confirm').exists()).toBe(true)
+
+    // spot check some content (structure / text)
+    const fourthSection = wrapper.findAll('#continuation-in-review-confirm > section').at(3)
+    expect(fourthSection.find('header h2').text()).toBe('Authorization')
+    expect(fourthSection.find('header p').text()).toContain('Confirm your authorization to complete and submit')
     expect(fourthSection.findComponent(Certify).exists()).toBe(true)
 
     wrapper.destroy()

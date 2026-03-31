@@ -11,6 +11,7 @@
     :message="getCompletingPartyStatement.certifyClause"
     :secondColumn="9"
     :statements="getCompletingPartyStatement.certifyStatements"
+    :showLegalName="showLegalName"
     @update:certifiedBy="onCertifiedBy($event)"
     @update:isCertified="onIsCertified($event)"
   />
@@ -33,6 +34,7 @@ export default class Certify extends Vue {
   @Prop({ required: true }) readonly disableEdit!: boolean
   @Prop({ required: true }) readonly invalidSection!: boolean
   @Prop({ required: true }) readonly isStaff!: boolean
+  @Prop({ default: true }) readonly showLegalName!: boolean
 
   @Getter(useStore) getCertifyState!: CertifyIF
   @Getter(useStore) getCompletingPartyStatement!: CompletingPartyStatementIF

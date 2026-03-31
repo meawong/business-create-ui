@@ -715,7 +715,9 @@ export const useStore = defineStore('store', {
       const isCourtOrderValid = IsAuthorized(AuthorizedActions.COURT_ORDER_POA)
         ? this.getCourtOrderStep.valid
         : true
-      const isCertifyValid = (this.getCertifyState.valid && !!this.getCertifyState.certifiedBy)
+      const isCertifyValid = this.isBaseCompany
+        ? this.getCertifyState.valid
+        : (this.getCertifyState.valid && !!this.getCertifyState.certifiedBy)
       const isStaffPaymentValid = IsAuthorized(AuthorizedActions.STAFF_PAYMENT)
         ? this.getStaffPaymentStep.valid
         : true
@@ -747,7 +749,9 @@ export const useStore = defineStore('store', {
       // otherwise, it's a continuation in application
       const isEffectiveDateTimeValid =
         (this.getFilingStatus === FilingStatus.DRAFT) ? this.getEffectiveDateTime.valid : true
-      const isCertifyValid = (this.getCertifyState.valid && !!this.getCertifyState.certifiedBy)
+      const isCertifyValid = this.isBaseCompany
+        ? this.getCertifyState.valid
+        : (this.getCertifyState.valid && !!this.getCertifyState.certifiedBy)
       const isCourtOrderValid = IsAuthorized(AuthorizedActions.COURT_ORDER_POA)
         ? this.getCourtOrderStep.valid
         : true
@@ -826,7 +830,9 @@ export const useStore = defineStore('store', {
 
     /** Whether all the restoration steps are valid. */
     isRestorationValid (): boolean {
-      const isCertifyValid = (this.getCertifyState.valid && !!this.getCertifyState.certifiedBy)
+      const isCertifyValid = this.isBaseCompany
+        ? this.getCertifyState.valid
+        : (this.getCertifyState.valid && !!this.getCertifyState.certifiedBy)
       const isStaffPaymentValid = IsAuthorized(AuthorizedActions.STAFF_PAYMENT)
         ? this.getStaffPaymentStep.valid
         : true

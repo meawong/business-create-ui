@@ -94,9 +94,10 @@ for (const test of restorationBusinessInfo) {
       expect(section.findComponent(DocumentDelivery).exists()).toBe(true)
     })
 
-    it('displays Certify section', () => {
+    it('displays Authorization section', () => {
       const section = wrapper.findAll('section').at(2)
-      expect(section.find('header h2').text()).toBe('Certify')
+      expect(section.find('header h2').text()).toBe('Authorization')
+      expect(section.find('header p').text()).toContain('Confirm your authorization to complete and submit')
       expect(section.findComponent(Certify).exists()).toBe(true)
     })
 
