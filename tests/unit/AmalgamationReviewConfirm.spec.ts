@@ -249,3 +249,57 @@ for (const test of amalgamationBusinessInfo) {
     })
   })
 }
+
+describe('Amalgamation Review Confirm — "Other" currency notice', () => {
+  const buildWrapper = (shareClasses: any[]) => shallowWrapperFactory(
+    AmalgamationReviewConfirm,
+    null,
+    {
+      amalgamation: { type: AmalgamationTypes.REGULAR },
+      entityType: 'BEN',
+      tombstone: {
+        filingType: FilingTypes.AMALGAMATION_APPLICATION,
+        authorizedActions: []
+      },
+      createShareStructureStep: { valid: true, shareClasses }
+    },
+    null,
+    null
+  )
+
+  it('shows the notice when a share class uses "OTHER" currency', () => {
+    const wrapper = buildWrapper([
+      { name: 'Class A', currency: 'OTHER', currencyAdditional: 'Bitcoin', hasRightsOrRestrictions: false }
+    ])
+    expect(wrapper.find('#other-currency-notice').exists()).toBe(true)
+    wrapper.destroy()
+  })
+
+  it('shows the notice when a share series uses "OTHER" currency', () => {
+    const wrapper = buildWrapper([
+      {
+        name: 'Class A',
+        currency: 'CAD',
+        hasRightsOrRestrictions: false,
+        series: [{ name: 'Series 1', currency: 'OTHER', hasRightsOrRestrictions: false }]
+      }
+    ])
+    expect(wrapper.find('#other-currency-notice').exists()).toBe(true)
+    wrapper.destroy()
+  })
+
+  it('does not show the notice when no share class or series uses "OTHER" currency', () => {
+    const wrapper = buildWrapper([
+      { name: 'Class A', currency: 'CAD', hasRightsOrRestrictions: false },
+      { name: 'Class B', currency: 'USD', hasRightsOrRestrictions: false }
+    ])
+    expect(wrapper.find('#other-currency-notice').exists()).toBe(false)
+    wrapper.destroy()
+  })
+
+  it('does not show the notice when there are no share classes', () => {
+    const wrapper = buildWrapper([])
+    expect(wrapper.find('#other-currency-notice').exists()).toBe(false)
+    wrapper.destroy()
+  })
+})

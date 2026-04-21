@@ -237,3 +237,117 @@ describe('formatParValue()', () => {
     })
   })
 })
+
+describe('series currency rendering', () => {
+  const makeWrapper = (shareClasses) => mount(ListShareClass, {
+    localVue,
+    vuetify,
+    propsData: { shareClasses }
+  })
+
+  it('falls back to the parent class currency when the series currency is unset', async () => {
+    const wrapper = makeWrapper([{
+      id: 1,
+      name: 'Class A',
+      priority: 0,
+      maxNumberOfShares: 100,
+      parValue: 1,
+      currency: 'CAD',
+      hasRightsOrRestrictions: false,
+      series: [{
+        id: 1,
+        name: 'Series A1',
+        priority: 1,
+        maxNumberOfShares: 10,
+        hasRightsOrRestrictions: false
+      }]
+    }])
+    await flushPromises()
+
+    const seriesRow = wrapper.vm.$el.querySelectorAll('.v-data-table .series-row')[0]
+    expect(seriesRow.querySelectorAll('td')[3].textContent).toContain('CAD')
+    wrapper.destroy()
+  })
+
+  it('uses the series\' own currency when it differs from the parent class', async () => {
+    const wrapper = makeWrapper([{
+      id: 1,
+      name: 'Class A',
+      priority: 0,
+      maxNumberOfShares: 100,
+      parValue: 1,
+      currency: 'CAD',
+      hasRightsOrRestrictions: false,
+      series: [{
+        id: 1,
+        name: 'Series A1',
+        priority: 1,
+        maxNumberOfShares: 10,
+        currency: 'USD',
+        hasRightsOrRestrictions: false
+      }]
+    }])
+    await flushPromises()
+
+    const seriesRow = wrapper.vm.$el.querySelectorAll('.v-data-table .series-row')[0]
+    expect(seriesRow.querySelectorAll('td')[3].textContent).toContain('USD')
+    wrapper.destroy()
+  })
+
+  it('uses the series\' currencyAdditional when the series carries legacy OTHER currency', async () => {
+    const wrapper = makeWrapper([{
+      id: 1,
+      name: 'Class A',
+      priority: 0,
+      maxNumberOfShares: 100,
+      parValue: 1,
+      currency: 'CAD',
+      hasRightsOrRestrictions: false,
+      series: [{
+        id: 1,
+        name: 'Series A1',
+        priority: 1,
+        maxNumberOfShares: 10,
+        currency: 'OTHER',
+        currencyAdditional: 'Bitcoin',
+        hasRightsOrRestrictions: false
+      }]
+    }])
+    await flushPromises()
+
+    const seriesRow = wrapper.vm.$el.querySelectorAll('.v-data-table .series-row')[0]
+    expect(seriesRow.querySelectorAll('td')[3].textContent).toContain('Bitcoin')
+    wrapper.destroy()
+  })
+})
+
+describe('formatCurrency()', () => {
+  let wrapper
+
+  beforeAll(() => {
+    wrapper = shallowMount(ListShareClass)
+  })
+
+  afterAll(() => {
+    wrapper.destroy()
+  })
+
+  it('returns the currency code for standard ISO currencies', () => {
+    expect(wrapper.vm.formatCurrency({ currency: 'CAD' })).toBe('CAD')
+    expect(wrapper.vm.formatCurrency({ currency: 'USD' })).toBe('USD')
+    expect(wrapper.vm.formatCurrency({ currency: 'EUR' })).toBe('EUR')
+  })
+
+  it('returns the free-text value for grandfathered OTHER currency', () => {
+    expect(wrapper.vm.formatCurrency({ currency: 'OTHER', currencyAdditional: 'Bitcoin' }))
+      .toBe('Bitcoin')
+    expect(wrapper.vm.formatCurrency({ currency: 'OTHER', currencyAdditional: 'Swiss Francs' }))
+      .toBe('Swiss Francs')
+  })
+
+  it('falls back to "Other" when OTHER currency has no free-text value', () => {
+    expect(wrapper.vm.formatCurrency({ currency: 'OTHER', currencyAdditional: '' })).toBe('Other')
+    expect(wrapper.vm.formatCurrency({ currency: 'OTHER', currencyAdditional: null })).toBe('Other')
+    expect(wrapper.vm.formatCurrency({ currency: 'OTHER' })).toBe('Other')
+  })
+})
