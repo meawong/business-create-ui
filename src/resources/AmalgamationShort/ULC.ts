@@ -35,9 +35,7 @@ export const AmalgamationShortResourceUlc: AmalgamationResourceIF = {
   },
   reviewAndConfirm: {
     completingPartyStatement: {
-      certifyStatements: [
-        ResourcePhrases.AMALGAMATION_CANNOT_BE_REVERSED
-      ],
+      certifyStatements: [],
       certifyClause: ResourcePhrases.OFFENCE_SECTION_427
     }
   }

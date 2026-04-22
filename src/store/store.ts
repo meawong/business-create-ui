@@ -1146,7 +1146,12 @@ export const useStore = defineStore('store', {
     /** The dissolution statement options. */
     getAffidavitResources (): AffidavitResourceIF {
       return this.resourceModel.affidavit
-    }
+    },
+
+    /** The certified by value, or undefined if this is a base company. */
+    getCertifiedBy (): string | undefined {
+      return this.isBaseCompany ? undefined : (this.getCertifyState.certifiedBy || undefined)
+    },
   },
   actions: {
     setAuthRoles (authRoles: Array<AuthorizationRoles>) {
