@@ -225,11 +225,17 @@
     >
       <header>
         <h2>Certify</h2>
-        <p v-if="isBaseCompany" class="mt-4">
+        <p
+          v-if="isBaseCompany"
+          class="mt-4"
+        >
           Certify your authorization to complete and submit this application. The name of the person submitting this
           filing will be displayed in the history of filings for this {{ getEntityDescription }}.
         </p>
-        <p v-else class="mt-4">
+        <p
+          v-else
+          class="mt-4"
+        >
           Confirm the legal name of the person authorized to complete and submit this application.
         </p>
       </header>
