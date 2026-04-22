@@ -102,7 +102,7 @@
         >
           Confirm the legal name of the person authorized to complete and submit this application.
         </p>
-      </header>s
+      </header>
 
       <v-card
         flat

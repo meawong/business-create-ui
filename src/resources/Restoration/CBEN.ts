@@ -2,6 +2,7 @@ import { RestorationResourceIF } from '@/interfaces'
 import { FilingCodes, RuleIds } from '@/enums'
 import { RestorationSteps } from './steps'
 import { CorpTypeCd, GetCorpFullDescription } from '@bcrs-shared-components/corp-type-module'
+import { ResourcePhrases } from '../ResourcePhrases'
 
 export const RestorationResourceCben: RestorationResourceIF = {
   entityType: CorpTypeCd.BEN_CONTINUE_IN,
@@ -39,9 +40,7 @@ export const RestorationResourceCben: RestorationResourceIF = {
   reviewAndConfirm: {
     completingPartyStatement: {
       certifyStatements: [],
-      certifyClause: `Note: It is an offence to make or assist in making a false or misleading
-        statement in a record filed under the BC Corporations Act. A person who commits this
-        offence is subject to a maximum fine of $5,000.`
+      certifyClause: ResourcePhrases.OFFENCE_SECTION_427
     }
   }
 }
