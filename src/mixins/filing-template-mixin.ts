@@ -145,7 +145,7 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
         filingId: this.getFilingId,
         folioNumber: this.getFolioNumber || undefined,
         isFutureEffective: this.getEffectiveDateTime.isFutureEffective,
-        ...(this.isBaseCompany ? { authorizationReceived: true } : {})
+        ...(this.isBaseCompany ? { authorizationReceived: this.getCertifyState.valid } : {})
       },
       business: {
         legalType: this.getEntityType,
@@ -371,7 +371,7 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
         filingId: this.getFilingId,
         folioNumber: this.getFolioNumber || undefined,
         isFutureEffective: this.getEffectiveDateTime.isFutureEffective,
-        ...(this.isBaseCompany ? { authorizationReceived: true } : {})
+        ...(this.isBaseCompany ? { authorizationReceived: this.isCertified } : {})
       },
       business: {
         identifier: this.getTempId,
@@ -909,7 +909,7 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
         filingId: this.getFilingId,
         folioNumber: this.getFolioNumber || undefined, // default FN; may be overwritten by staff BCOL FN
         isFutureEffective: false,
-        ...(this.isBaseCompany ? { authorizationReceived: true } : {})
+        ...(this.isBaseCompany ? { authorizationReceived: this.getCertifyState.valid } : {})
       },
       business: {
         legalType: this.getEntityType,
