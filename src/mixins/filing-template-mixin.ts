@@ -141,12 +141,13 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
     const filing: AmalgamationFilingIF = {
       header: {
         name: FilingTypes.AMALGAMATION_APPLICATION,
-        certifiedBy: this.getCertifiedBy,
         date: this.getCurrentDate,
         filingId: this.getFilingId,
         folioNumber: this.getFolioNumber || undefined,
         isFutureEffective: this.getEffectiveDateTime.isFutureEffective,
-        ...(this.isBaseCompany ? { authorizationReceived: this.getCertifyState.valid } : {})
+        ...(this.isBaseCompany
+          ? { authorizationReceived: this.getCertifyState.valid }
+          : { certifiedBy: this.getCertifyState.certifiedBy })
       },
       business: {
         legalType: this.getEntityType,
@@ -367,12 +368,13 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
     const filing: ContinuationInFilingIF = {
       header: {
         name: FilingTypes.CONTINUATION_IN,
-        certifiedBy: this.getCertifiedBy,
         date: this.getCurrentDate,
         filingId: this.getFilingId,
         folioNumber: this.getFolioNumber || undefined,
         isFutureEffective: this.getEffectiveDateTime.isFutureEffective,
-        ...(this.isBaseCompany ? { authorizationReceived: this.isCertified } : {})
+        ...(this.isBaseCompany
+          ? { authorizationReceived: this.getCertifyState.valid }
+          : { certifiedBy: this.getCertifyState.certifiedBy })
       },
       business: {
         identifier: this.getTempId,
@@ -905,12 +907,13 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
     const filing: RestorationFilingIF = {
       header: {
         name: FilingTypes.RESTORATION,
-        certifiedBy: this.getCertifiedBy,
         date: this.getCurrentDate,
         filingId: this.getFilingId,
         folioNumber: this.getFolioNumber || undefined, // default FN; may be overwritten by staff BCOL FN
         isFutureEffective: false,
-        ...(this.isBaseCompany ? { authorizationReceived: this.getCertifyState.valid } : {})
+        ...(this.isBaseCompany
+          ? { authorizationReceived: this.getCertifyState.valid }
+          : { certifiedBy: this.getCertifyState.certifiedBy })
       },
       business: {
         legalType: this.getEntityType,

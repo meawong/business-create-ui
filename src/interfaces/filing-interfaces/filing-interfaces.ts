@@ -26,7 +26,8 @@ export interface NameRequestFilingIF {
 export interface AmalgamationFilingIF {
   header: {
     name: FilingTypes
-    certifiedBy: string
+    authorizationReceived?: boolean // corps filings only
+    certifiedBy?: string // non corps filings only
     date: string
     effectiveDate?: string // should be set only for future effective filings
     filingId?: number // for existing filings (not used when building a new filing)
@@ -75,7 +76,8 @@ export interface AmalgamationFilingIF {
 export interface ContinuationInFilingIF {
   header: {
     name: FilingTypes
-    certifiedBy: string
+    authorizationReceived?: boolean // corps filings only
+    certifiedBy?: string // non corps filings only
     date: string
     effectiveDate?: string // should be set only for future effective filings
     filingId?: number // for existing filings (not used when building a new filing)
@@ -282,7 +284,8 @@ export interface DissolutionFilingIF {
 export interface RestorationFilingIF {
   header: {
     name: FilingTypes
-    certifiedBy: string
+    authorizationReceived?: boolean // corps filings only
+    certifiedBy?: string // non corps filings only
     date: string
     effectiveDate?: string // not saved by UI but may be provided by API
     filingId?: number // not saved by UI but may be provided by API
