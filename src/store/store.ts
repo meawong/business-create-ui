@@ -74,7 +74,8 @@ import {
   StepIF,
   UploadAffidavitIF,
   ValidationDetailIF,
-  ResolutionIF
+  ResolutionIF,
+  ConfirmCompletionIF
 } from '@/interfaces'
 import { GetFeatureFlag } from '@/utils/feature-flag-utils'
 import { IsAuthorized } from '@/utils'
@@ -867,6 +868,10 @@ export const useStore = defineStore('store', {
       return this.stateModel.certifyState
     },
 
+    getConfirmCompletionState (): ConfirmCompletionIF {
+      return this.stateModel.confirmCompletionState
+    },
+
     /** The users's email address. */
     getUserEmail (): string {
       return this.stateModel.tombstone.userEmail
@@ -1150,7 +1155,9 @@ export const useStore = defineStore('store', {
 
     /** The certified by value, or undefined if this is a base company. */
     getCertifiedBy (): string | undefined {
-      return this.isBaseCompany ? undefined : (this.getCertifyState.certifiedBy || undefined)
+      return this.isBaseCompany
+        ? this.getConfirmCompletionState.completedBy
+        : (this.getCertifyState.certifiedBy || undefined)
     }
   },
   actions: {
@@ -1251,6 +1258,10 @@ export const useStore = defineStore('store', {
     },
     setCertifyState (certifyState: CertifyIF) {
       this.stateModel.certifyState = certifyState
+      if (!this.stateModel.ignoreChanges) this.stateModel.haveChanges = true
+    },
+    setConfirmCompletionState (confirmCompletionState: ConfirmCompletionIF) {
+      this.stateModel.confirmCompletionState = confirmCompletionState
       if (!this.stateModel.ignoreChanges) this.stateModel.haveChanges = true
     },
     setBusinessContact (businessContact: ContactPointIF) {

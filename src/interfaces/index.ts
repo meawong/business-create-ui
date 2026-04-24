@@ -43,6 +43,7 @@ export * from './stepper-interfaces/Dissolution/dissolution-statement-interface'
 export * from './stepper-interfaces/IncorporationAgreement/help-section-interface'
 export * from './stepper-interfaces/IncorporationAgreement/incorporation-agreement-interface'
 export * from './stepper-interfaces/ReviewConfirm/certify-interface'
+export * from './stepper-interfaces/ReviewConfirm/confirm-completion-interface'
 
 // Store interfaces
 export * from './store-interfaces/state-interfaces/account-information-interface'

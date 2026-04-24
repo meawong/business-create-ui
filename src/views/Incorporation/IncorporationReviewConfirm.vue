@@ -161,6 +161,28 @@
       </v-card>
     </section>
 
+    <!-- Completing Party Statement -->
+    <ConfirmCompletion
+      v-if="isBaseCompany"
+      class="mt-10"
+      :invalid-section="isCompPartyInvalid"
+      @emitConfirmed="setConfirmed($event)"
+    >
+      I, {{ userFullName }}, the completing party, have examined the incorporation
+      agreement and articles applicable to the company being incorporated and confirm the following:
+
+      <template #header>
+        <h2>Completing Party Statement</h2>
+      </template>
+      <template #under-checkbox>
+        (a) a signature line exists for each incorporator,
+        <br><br>
+        (b) each signature line contains an original signature, and
+        <br><br>
+        (c) I have no reason to believe any signature is not that of the identified incorporator.
+      </template>
+    </ConfirmCompletion>
+
     <!-- Certify -->
     <section
       id="certify-section"
@@ -169,7 +191,7 @@
       <header>
         <h2>Certify</h2>
         <p class="mt-4">
-          Confirm the legal name of the person authorized to complete and submit this application.
+          {{ certifyText }}
         </p>
       </header>
 
@@ -183,6 +205,7 @@
           :disableEdit="isEntityCoop && !IsAuthorized(AuthorizedActions.EDITABLE_CERTIFY_NAME)"
           :invalidSection="isCertifyInvalid"
           :isStaff="IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)"
+          :showLegalName="!isBaseCompany"
         />
       </v-card>
     </section>
@@ -246,9 +269,11 @@ import { Component, Vue } from 'vue-property-decorator'
 import { Action, Getter } from 'pinia-class'
 import { useStore } from '@/store/store'
 import { ContactPointIF, CertifyIF, EffectiveDateTimeIF, IncorporationAgreementIF,
-  ShareStructureIF, CourtOrderStepIF, DocumentDeliveryIF } from '@/interfaces'
+  ShareStructureIF, CourtOrderStepIF, DocumentDeliveryIF, ConfirmCompletionIF
+} from '@/interfaces'
 import { AuthorizedActions } from '@/enums'
 import AgreementType from '@/components/common/AgreementType.vue'
+import ConfirmCompletion from '@/components/common/ConfirmCompletion.vue'
 import CardHeader from '@/components/common/CardHeader.vue'
 import Certify from '@/components/common/Certify.vue'
 import { CourtOrderPoa } from '@bcrs-shared-components/court-order-poa'
@@ -268,6 +293,7 @@ import { IsAuthorized } from '@/utils'
     AgreementType,
     CardHeader,
     Certify,
+    ConfirmCompletion,
     CourtOrderPoa,
     DocumentDelivery,
     EffectiveDateTime,
@@ -284,8 +310,16 @@ export default class IncorporationReviewConfirm extends Vue {
   readonly AuthorizedActions = AuthorizedActions
   readonly IsAuthorized = IsAuthorized
 
+  setConfirmed (confirmed: boolean) {
+    this.setConfirmCompletionState({
+      confirmed,
+      completedBy: confirmed ? this.userFullName : undefined
+    })
+  }
+
   @Getter(useStore) getBusinessContact!: ContactPointIF
   @Getter(useStore) getCertifyState!: CertifyIF
+  @Getter(useStore) getConfirmCompletionState!: ConfirmCompletionIF
   @Getter(useStore) getCompanyDisplayName!: string
   @Getter(useStore) getCourtOrderStep!: CourtOrderStepIF
   @Getter(useStore) getCreateShareStructureStep!: ShareStructureIF
@@ -294,11 +328,14 @@ export default class IncorporationReviewConfirm extends Vue {
   @Getter(useStore) getEntityType!: CorpTypeCd
   @Getter(useStore) getIncorporationAgreementStep!: IncorporationAgreementIF
   @Getter(useStore) getUserEmail!: string
+  @Getter(useStore) getUserFirstname!: string
+  @Getter(useStore) getUserLastname!: string
   @Getter(useStore) getValidateSteps!: boolean
   @Getter(useStore) isBaseCompany!: boolean
   @Getter(useStore) isEntityCoop!: boolean
 
   @Action(useStore) setCertifyState!: (x: CertifyIF) => void
+  @Action(useStore) setConfirmCompletionState!: (x: ConfirmCompletionIF) => void
   @Action(useStore) setCourtOrderFileNumber!: (x: string) => void
   @Action(useStore) setCourtOrderValidity!: (x: boolean) => void
   @Action(useStore) setDocumentOptionalEmail!: (x: string) => void
@@ -331,7 +368,14 @@ export default class IncorporationReviewConfirm extends Vue {
 
   /** Is true when the certify conditions are not met. */
   get isCertifyInvalid (): boolean {
-    return this.getValidateSteps && !(this.getCertifyState.certifiedBy && this.getCertifyState.valid)
+    return this.getValidateSteps && (
+      this.isBaseCompany
+        ? !this.getCertifyState.valid
+        : !this.getCertifyState.valid || !this.getCertifyState.certifiedBy)
+  }
+
+  get isCompPartyInvalid (): boolean {
+    return this.getValidateSteps && !this.getConfirmCompletionState.confirmed
   }
 
   /** Is true when the Court Order conditions are not met. */
@@ -350,6 +394,18 @@ export default class IncorporationReviewConfirm extends Vue {
    */
   get documentOptionalEmail (): string {
     return this.getDocumentDelivery.documentOptionalEmail || this.getUserEmail
+  }
+
+  get userFullName (): string {
+    return `${this.getUserFirstname?.trim()} ${this.getUserLastname?.trim()}`.trim() || undefined
+  }
+
+  get certifyText (): string {
+    return this.isBaseCompany
+      ? 'Certify your authorization to complete and submit this filing. ' +
+        'The name of the person submitting this filing will be displayed in ' +
+        `the history of filings for this ${this.getEntityDescription}.`
+      : 'Confirm the legal name of the person authorized to complete and submit this application.'
   }
 }
 </script>

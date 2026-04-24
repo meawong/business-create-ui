@@ -134,6 +134,7 @@ export interface IncorporationFilingIF {
     name: FilingTypes
     certifiedBy: string
     date: string
+    authorizationReceived?: boolean // only set for corps
     effectiveDate?: string // should be set only for future effective filings
     filingId?: number // for existing filings (not used when building a new filing)
     folioNumber?: string // only displayed for certain account types

@@ -85,11 +85,7 @@ export const IncorporationResourceUlc: IncorporationResourceIF = {
   },
   reviewAndConfirm: {
     completingPartyStatement: {
-      certifyStatements: [
-        ResourcePhrases.ORIGINAL_SIGNATURE,
-        ResourcePhrases.BELIEVE_SIGNATURE,
-        ResourcePhrases.RELEVANT_KNOWLEDGE_OF_COMPANY
-      ],
+      certifyStatements: [],
       certifyClause: ResourcePhrases.OFFENCE_SECTION_427
     }
   }

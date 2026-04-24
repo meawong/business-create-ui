@@ -3,7 +3,7 @@ import { Getter, Action } from 'pinia-class'
 import { useStore } from '@/store/store'
 import { AmalgamationMixin, DateMixin } from '@/mixins'
 import {
-  AmalgamationFilingIF, BusinessAddressIF, ContactPointIF, CertifyIF, CompletingPartyIF,
+  AmalgamationFilingIF, BusinessAddressIF, ContactPointIF, CertifyIF, ConfirmCompletionIF, CompletingPartyIF,
   AuthorizationProofIF, ContinuationInFilingIF, CourtOrderIF, CourtOrderStepIF,
   CreateMemorandumIF, CreateResolutionIF, CreateRulesIF, DissolutionFilingIF,
   DissolutionStatementIF, DocumentDeliveryIF, EffectiveDateTimeIF, EmptyNaics,
@@ -11,7 +11,8 @@ import {
   NameRequestFilingIF, NameTranslationIF, OfficeAddressIF, OrgPersonIF, PartyIF,
   RegistrationFilingIF, RegistrationStateIF, RestorationFilingIF, RestorationStateIF,
   ShareStructureIF, SpecialResolutionIF, StaffPaymentIF, StaffPaymentStepIF, UploadAffidavitIF,
-  ResolutionIF, RegisteredRecordsAddressesIF } from '@/interfaces'
+  ResolutionIF, RegisteredRecordsAddressesIF
+} from '@/interfaces'
 import {
   AmalgamationTypes, ApprovalTypes, AuthorizedActions, BusinessTypes, CoopTypes, DissolutionTypes,
   EffectOfOrders, FilingTypes, PartyTypes, RelationshipTypes, RestorationTypes, RoleTypes,
@@ -86,6 +87,7 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
   // @Action(useStore) setBusinessContact!: (x: ContactPointIF) => void
   @Action(useStore) setBusinessStartDate!: (x: string) => void
   @Action(useStore) setCertifyState!: (x: CertifyIF) => void
+  @Action(useStore) setConfirmCompletionState!: (x: ConfirmCompletionIF) => void
   @Action(useStore) setContinuationAuthorization!: (x: AuthorizationProofIF) => void
   @Action(useStore) setCooperativeType!: (x: CoopTypes) => void
   // @Action(useStore) setCorrectNameOption!: (x: CorrectNameOptions) => void
@@ -605,7 +607,7 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
     const filing: IncorporationFilingIF = {
       header: {
         name: FilingTypes.INCORPORATION_APPLICATION,
-        certifiedBy: this.getCertifyState.certifiedBy,
+        certifiedBy: this.getCertifiedBy,
         date: this.getCurrentDate,
         filingId: this.getFilingId,
         folioNumber: this.getFolioNumber || undefined,
@@ -654,6 +656,7 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
       case CorpTypeCd.BC_CCC:
       case CorpTypeCd.BC_COMPANY:
       case CorpTypeCd.BC_ULC_COMPANY: {
+        filing.header.authorizationReceived = true
         filing.incorporationApplication.shareStructure = {
           shareClasses: this.getCreateShareStructureStep.shareClasses
         }
@@ -807,6 +810,11 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
     this.setCertifyState({
       valid: false, // never restore checkbox
       certifiedBy: draftFiling.header.certifiedBy
+    })
+
+    this.setConfirmCompletionState({
+      confirmed: false, // never restore checkbox
+      completedBy: draftFiling.header.certifiedBy
     })
 
     // restore Future Effective data

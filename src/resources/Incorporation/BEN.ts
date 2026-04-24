@@ -111,14 +111,7 @@ export const IncorporationResourceBen: IncorporationResourceIF = {
   },
   reviewAndConfirm: {
     completingPartyStatement: {
-      certifyStatements: [
-        `The Company Articles and the Incorporation Agreement both contain a signature
-          line for each person identified as an incorporator in the Incorporation Application
-          with the name of that person set out legibly under the signature line,`,
-        ResourcePhrases.ORIGINAL_SIGNATURE,
-        ResourcePhrases.BELIEVE_SIGNATURE,
-        ResourcePhrases.RELEVANT_KNOWLEDGE_OF_COMPANY
-      ],
+      certifyStatements: [],
       certifyClause: ResourcePhrases.OFFENCE_SECTION_427
     }
   }

@@ -111,6 +111,10 @@ export const stateModel: StateModelIF = {
     valid: false,
     certifiedBy: ''
   },
+  confirmCompletionState: {
+    confirmed: false,
+    completedBy: ''
+  },
   documentDelivery: {
     documentOptionalEmail: '',
     valid: true

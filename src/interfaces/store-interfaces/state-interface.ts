@@ -7,6 +7,7 @@ import {
   ContactPointIF,
   BusinessIF,
   CertifyIF,
+  ConfirmCompletionIF,
   ContinuationInStateIF,
   CompletingPartyIF,
   CourtOrderStepIF,
@@ -51,6 +52,7 @@ export interface StateModelIF {
   currentDate: string
   effectiveDateTime: EffectiveDateTimeIF
   certifyState: CertifyIF
+  confirmCompletionState: ConfirmCompletionIF
   documentDelivery: DocumentDeliveryIF
   currentStep: number
   tempId: string
