@@ -1,6 +1,6 @@
 <template>
   <section
-    id="completing-party-stmnt-section"
+    id="confirm-completion-section"
   >
     <header>
       <slot name="header" />

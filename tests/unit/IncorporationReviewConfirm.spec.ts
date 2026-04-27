@@ -1,9 +1,10 @@
-import { shallowWrapperFactory } from '../vitest-wrapper-factory'
+import { shallowWrapperFactory, wrapperFactory } from '../vitest-wrapper-factory'
 import IncorporationReviewConfirm from '@/views/Incorporation/IncorporationReviewConfirm.vue'
 import { IncorporationResources } from '@/resources/'
 import SummaryDefineCompany from '@/components/common/SummaryDefineCompany.vue'
 import ListPeopleAndRoles from '@/components/common/ListPeopleAndRoles.vue'
 import Certify from '@/components/common/Certify.vue'
+import ConfirmCompletion from '@/components/common/ConfirmCompletion.vue'
 import { AuthorizationRoles } from '@/enums'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '@/store/store'
@@ -11,6 +12,8 @@ import { setAuthRole } from '../set-auth-role'
 
 setActivePinia(createPinia())
 const store = useStore()
+store.stateModel.tombstone.userFirstname = 'Test'
+store.stateModel.tombstone.userLastname = 'User'
 
 // Test Case Data
 const reviewConfirmTestCases = [
@@ -72,12 +75,20 @@ for (const test of reviewConfirmTestCases) {
       // verify People and roles component displayed
       expect(wrapper.findComponent(ListPeopleAndRoles).exists()).toBe(true)
 
+      if (test.entityType !== 'CP') {
+        // verify Confirm Completion component displayed
+        expect(wrapper.findComponent(ConfirmCompletion).exists()).toBe(true)
+      } else {
+        // verify Confirm Completion component is not displayed
+        expect(wrapper.findComponent(ConfirmCompletion).exists()).toBe(false)
+      }
+
       // verify Certify component displayed
       expect(wrapper.findComponent(Certify).exists()).toBe(true)
     })
 
-    it('displays Certify section', () => {
-      wrapper = shallowWrapperFactory(
+    it('displays Confirm Completion section', () => {
+      wrapper = wrapperFactory(
         IncorporationReviewConfirm,
         null,
         { entityType: test.entityType },
@@ -85,7 +96,56 @@ for (const test of reviewConfirmTestCases) {
         IncorporationResources
       )
 
-      expect(wrapper.find('#certify-section').exists()).toBe(true)
+      const confirmCompletion = wrapper.find('#confirm-completion-section')
+      if (test.entityType === 'CP') {
+        expect(confirmCompletion.exists()).toBe(false)
+      } else {
+        expect(confirmCompletion.exists()).toBe(true)
+        expect(confirmCompletion.find('header h2').text()).toBe('Completing Party Statement')
+        expect(confirmCompletion.find('p').text()).toBe(
+          'The following information must be completed and confirmed before submitting this filing.')
+        const stmnts = confirmCompletion.findAll('p.stmt-text')
+        expect(stmnts.length).toBe(2)
+        expect(stmnts.at(0).text()).toBe(
+          'I, Test User, the completing party, have examined the ' +
+          'incorporation agreement and articles applicable to the company being ' +
+          'incorporated and confirm the following:')
+        expect(stmnts.at(1).text()).toBe(
+          '(a) a signature line exists for each incorporator,  ' +
+          '(b) each signature line contains an original signature, and  ' +
+          '(c) I have no reason to believe any signature is not that of the identified incorporator.'
+        )
+      }
+    })
+
+    it('displays Certify section', () => {
+      wrapper = wrapperFactory(
+        IncorporationReviewConfirm,
+        null,
+        { entityType: test.entityType },
+        null,
+        IncorporationResources
+      )
+
+      const certifySection = wrapper.find('#certify-section')
+      expect(certifySection.exists()).toBe(true)
+
+      if (test.entityType !== 'CP') {
+        expect(certifySection.find('header h2').text()).toBe('Certify')
+        expect(certifySection.find('p').text()).toContain(
+          'Certify your authorization to complete and submit this filing.')
+
+        expect(certifySection.find('div.certify-stmt').text()).toContain(
+          'I certify that the information provided is correct')
+
+        const clauses = certifySection.findAll('.certify-clause')
+        expect(clauses.length).toBe(2)
+        expect(clauses.at(0).text()).toBe('Date:')
+        expect(clauses.at(1).text()).toBe(
+          'Note: It is an offence to make a false or misleading statement ' +
+          'in respect of a material fact in a record submitted to the ' +
+          'Corporate Registry for filing. See section 427 of the Business Corporations Act.')
+      }
     })
 
     it('displays Court Order and POA only for BEN, ULC, CC, BC; and only for staff', () => {

@@ -90,7 +90,13 @@ describe('Actions component - Incorporation Application', () => {
   it('Enables File and Pay button when certify from is valid', async () => {
     store.stateModel.certifyState = {
       valid: true,
-      certifiedBy: 'Some certifier'
+      certifiedBy: undefined
+    }
+    store.stateModel.tombstone.userFirstname = 'Some'
+    store.stateModel.tombstone.userLastname = 'Person'
+    store.stateModel.confirmCompletionState = {
+      confirmed: true,
+      completedBy: 'Some person'
     }
     store.stateModel.entityType = CorpTypeCd.BENEFIT_COMPANY
     store.stateModel.nameRequest.legalType = CorpTypeCd.BENEFIT_COMPANY
@@ -236,7 +242,13 @@ describe('Actions component - NR Validation', () => {
     } as TombstoneIF
     store.stateModel.certifyState = {
       valid: true,
-      certifiedBy: 'Some certifier'
+      certifiedBy: undefined
+    }
+    store.stateModel.tombstone.userFirstname = 'Some'
+    store.stateModel.tombstone.userLastname = 'Person'
+    store.stateModel.confirmCompletionState = {
+      confirmed: true,
+      completedBy: 'Some person'
     }
     store.stateModel.entityType = CorpTypeCd.BENEFIT_COMPANY
     store.stateModel.defineCompanyStep = { valid: true } as DefineCompanyIF
@@ -291,6 +303,7 @@ describe('Actions component - Filing Functionality', () => {
   const filing = {
     header: {
       name: 'incorporationApplication',
+      authorizationReceived: true,
       certifiedBy: 'Certified By',
       date: '2020/01/29',
       effectiveDate: formattedEffectiveDate,
@@ -493,7 +506,16 @@ describe('Actions component - Filing Functionality', () => {
       folioNumber: '123456',
       authorizedActions: []
     } as TombstoneIF
-    store.stateModel.certifyState.certifiedBy = filing.header.certifiedBy
+    store.stateModel.certifyState = {
+      valid: false,
+      certifiedBy: undefined
+    }
+    store.stateModel.tombstone.userFirstname = 'Certified'
+    store.stateModel.tombstone.userLastname = 'By'
+    store.stateModel.confirmCompletionState = {
+      confirmed: false,
+      completedBy: 'Certified By'
+    }
     store.stateModel.businessContact = {
       email: filing.incorporationApplication.contactPoint.email,
       phone: filing.incorporationApplication.contactPoint.phone,
@@ -675,7 +697,13 @@ describe('Actions component - Conditionally disabled File and Pay button', () =>
   beforeAll(() => {
     store.stateModel.certifyState = {
       valid: true,
-      certifiedBy: 'Some certifier'
+      certifiedBy: undefined
+    }
+    store.stateModel.tombstone.userFirstname = 'Some'
+    store.stateModel.tombstone.userLastname = 'Person'
+    store.stateModel.confirmCompletionState = {
+      confirmed: true,
+      completedBy: 'Some person'
     }
     store.stateModel.entityType = CorpTypeCd.BENEFIT_COMPANY
     store.stateModel.nameRequest.legalType = CorpTypeCd.BENEFIT_COMPANY
