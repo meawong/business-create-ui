@@ -74,7 +74,6 @@ import { ConfirmCompletionIF } from '@/interfaces'
 export default class ConfirmCompletion extends Vue {
   @Getter(useStore) getConfirmCompletionState!: ConfirmCompletionIF
 
-  @Prop({ required: true }) readonly heading!: string
   @Prop({ default: false }) readonly invalidSection!: boolean
 
   @Emit('emitConfirmed')

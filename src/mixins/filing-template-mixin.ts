@@ -656,7 +656,7 @@ export default class FilingTemplateMixin extends Mixins(AmalgamationMixin, DateM
       case CorpTypeCd.BC_CCC:
       case CorpTypeCd.BC_COMPANY:
       case CorpTypeCd.BC_ULC_COMPANY: {
-        filing.header.authorizationReceived = true
+        filing.header.authorizationReceived = this.getCertifyState.valid
         filing.incorporationApplication.shareStructure = {
           shareClasses: this.getCreateShareStructureStep.shareClasses
         }
