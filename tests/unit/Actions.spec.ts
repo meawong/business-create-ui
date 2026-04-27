@@ -303,7 +303,7 @@ describe('Actions component - Filing Functionality', () => {
   const filing = {
     header: {
       name: 'incorporationApplication',
-      authorizationReceived: true,
+      authorizationReceived: false, // certified checkbox will be unchecked
       certifiedBy: 'Certified By',
       date: '2020/01/29',
       effectiveDate: formattedEffectiveDate,
