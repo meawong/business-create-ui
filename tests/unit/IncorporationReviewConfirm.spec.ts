@@ -115,14 +115,17 @@ for (const test of reviewConfirmTestCases) {
         expect(confirmCompletion.find('header h2').text()).toBe('Completing Party Statement')
         expect(confirmCompletion.find('p').text()).toBe(
           'The following information must be completed and confirmed before submitting this filing.')
+        const compPartyTextField = confirmCompletion.find('#completing-party-textfield')
         const stmnts = confirmCompletion.findAll('p.stmt-text')
         expect(stmnts.length).toBe(1)
         if (test.isStaff) {
+          expect(compPartyTextField.exists()).toBe(true)
           expect(stmnts.at(0).text()).toContain(
             'I, [Legal name of completing party], the completing party, have examined the ' +
             'incorporation agreement and articles applicable to the company being ' +
             'incorporated and confirm the following:')
         } else {
+          expect(compPartyTextField.exists()).toBe(false)
           expect(stmnts.at(0).text()).toContain(
             'I, Test User, the completing party, have examined the ' +
             'incorporation agreement and articles applicable to the company being ' +
