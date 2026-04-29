@@ -232,7 +232,7 @@
             #checkbox-label
           >
             <p
-              class="ma-0"
+              class="ma-0 certify-stmt"
               :style="{ 'font-size': '0.875rem' }"
             >
               {{ completingParty || '[Completing Party]' }}
@@ -268,7 +268,10 @@
           :invalidSection="isCertifyInvalid"
           :isStaff="IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)"
         >
-          <template v-if="!isEntityCoop" #checkbox-label>
+          <template
+            v-if="!isEntityCoop"
+            #checkbox-label
+          >
             <p
               class="ma-0"
               style="font-size: 0.875rem;"

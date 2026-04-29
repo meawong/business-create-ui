@@ -9,11 +9,17 @@ import { AuthorizationRoles } from '@/enums'
 import { createPinia, setActivePinia } from 'pinia'
 import { useStore } from '@/store/store'
 import { setAuthRole } from '../set-auth-role'
+import * as FeatureFlags from '@/utils/feature-flag-utils'
 
 setActivePinia(createPinia())
 const store = useStore()
 store.stateModel.tombstone.userFirstname = 'Test'
 store.stateModel.tombstone.userLastname = 'User'
+
+vi.mock('@/utils/feature-flags', () => {
+  // we just care about this one function
+  return { GetFeatureFlag: vi.fn() }
+})
 
 // Test Case Data
 const reviewConfirmTestCases = [
@@ -62,6 +68,10 @@ const reviewConfirmTestCases = [
 for (const test of reviewConfirmTestCases) {
   describe(`Review Confirm view for a ${test.entityType}`, () => {
     let wrapper: any
+    vi.spyOn(FeatureFlags, 'GetFeatureFlag').mockImplementation(flag => {
+      if (flag === 'enable-new-feature') return 'incorporationApplication-completingParty'
+      return null
+    })
 
     it('renders the component properly', () => {
       wrapper = shallowWrapperFactory(IncorporationReviewConfirm, null, { entityType: test.entityType })
@@ -88,6 +98,7 @@ for (const test of reviewConfirmTestCases) {
     })
 
     it('displays Confirm Completion section', () => {
+      setAuthRole(store, test.isStaff ? AuthorizationRoles.STAFF : null)
       wrapper = wrapperFactory(
         IncorporationReviewConfirm,
         null,
@@ -105,12 +116,19 @@ for (const test of reviewConfirmTestCases) {
         expect(confirmCompletion.find('p').text()).toBe(
           'The following information must be completed and confirmed before submitting this filing.')
         const stmnts = confirmCompletion.findAll('p.stmt-text')
-        expect(stmnts.length).toBe(2)
-        expect(stmnts.at(0).text()).toBe(
-          'I, Test User, the completing party, have examined the ' +
-          'incorporation agreement and articles applicable to the company being ' +
-          'incorporated and confirm the following:')
-        expect(stmnts.at(1).text()).toBe(
+        expect(stmnts.length).toBe(1)
+        if (test.isStaff) {
+          expect(stmnts.at(0).text()).toContain(
+            'I, [Legal name of completing party], the completing party, have examined the ' +
+            'incorporation agreement and articles applicable to the company being ' +
+            'incorporated and confirm the following:')
+        } else {
+          expect(stmnts.at(0).text()).toContain(
+            'I, Test User, the completing party, have examined the ' +
+            'incorporation agreement and articles applicable to the company being ' +
+            'incorporated and confirm the following:')
+        }
+        expect(stmnts.at(0).text()).toContain(
           '(a) a signature line exists for each incorporator,  ' +
           '(b) each signature line contains an original signature, and  ' +
           '(c) I have no reason to believe any signature is not that of the identified incorporator.'
@@ -119,6 +137,7 @@ for (const test of reviewConfirmTestCases) {
     })
 
     it('displays Certify section', () => {
+      setAuthRole(store, test.isStaff ? AuthorizationRoles.STAFF : null)
       wrapper = wrapperFactory(
         IncorporationReviewConfirm,
         null,
@@ -135,8 +154,13 @@ for (const test of reviewConfirmTestCases) {
         expect(certifySection.find('p').text()).toContain(
           'Certify your authorization to complete and submit this filing.')
 
-        expect(certifySection.find('div.certify-stmt').text()).toContain(
-          'I certify that the information provided is correct')
+        if (test.isStaff) {
+          expect(certifySection.find('.certify-stmt').text()).toContain(
+            '[Completing Party] certifies that the information provided is correct')
+        } else {
+          expect(certifySection.find('.certify-stmt').text()).toContain(
+            'I certify that the information provided is correct')
+        }
 
         const clauses = certifySection.findAll('.certify-clause')
         expect(clauses.length).toBe(2)
