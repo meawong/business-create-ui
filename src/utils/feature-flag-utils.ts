@@ -10,6 +10,7 @@ declare const window: any
 const defaultFlagSet: LDFlagSet = {
   'supported-filings': [],
   'enable-legal-name-fix': false, // by default, the easy legal name changes are disabled
+  'enable-new-feature': '',
   'enable-web-chat': false, // by default, old webchat is disabled
   'enable-genesys-web-message': false, // by default, genesys web message is disabled
   'banner-text': '', // by default, there is no banner text

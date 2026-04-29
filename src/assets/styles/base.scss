@@ -262,14 +262,16 @@ p {
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
 
-  .title-label {
-    color: $app-red !important;
-  }
-
   // make the left red border square (v-cards are otherwise rounded)
   &.v-card {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
+  }
+}
+
+.invalid-section:not(.prevent-red-title) {
+  .title-label {
+    color: $app-red !important;
   }
 }
 

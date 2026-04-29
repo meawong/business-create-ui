@@ -1155,7 +1155,9 @@ export const useStore = defineStore('store', {
 
     /** The certified by value, or undefined if this is a base company. */
     getCertifiedBy (): string | undefined {
-      return this.isBaseCompany
+      const isCompletingPartyReleased = GetFeatureFlag('enable-new-feature')
+        ?.includes('incorporationApplication-completingParty')
+      return this.isBaseCompany && this.getFilingType === 'incorporationApplication' && isCompletingPartyReleased
         ? this.getConfirmCompletionState.completedBy
         : (this.getCertifyState.certifiedBy || undefined)
     }

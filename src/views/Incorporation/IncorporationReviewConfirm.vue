@@ -163,28 +163,48 @@
 
     <!-- Completing Party Statement -->
     <ConfirmCompletion
-      v-if="isBaseCompany"
+      v-if="isBaseCompany && showCompPartyChanges"
       class="mt-10"
       :invalid-section="isCompPartyInvalid"
       @emitConfirmed="setConfirmed($event)"
     >
-      I, {{ userFullName }}, the completing party, have examined the incorporation
-      agreement and articles applicable to the company being incorporated and confirm the following:
-
       <template #header>
         <h2>Completing Party Statement</h2>
       </template>
-      <template #under-checkbox>
-        (a) a signature line exists for each incorporator,
-        <br><br>
-        (b) each signature line contains an original signature, and
-        <br><br>
-        (c) I have no reason to believe any signature is not that of the identified incorporator.
+      <template
+        v-if="IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)"
+        #above-checkbox
+      >
+        <v-form
+          ref="completingPartyForm"
+          class="flex"
+          lazy-validation
+          @submit.prevent
+        >
+          <v-text-field
+            id="completing-party-textfield"
+            v-model="enteredCompletingParty"
+            filled
+            persistent-hint
+            label="Legal name of completing party"
+            :rules="[(v) => !!v || 'Please enter the full legal name of the completing party']"
+          />
+        </v-form>
       </template>
+      I, <b>{{ completingParty || '[Legal name of completing party]' }}</b>,
+      the completing party, have examined the incorporation agreement and
+      articles applicable to the company being incorporated and confirm the following:
+      <br><br>
+      (a) a signature line exists for each incorporator,
+      <br><br>
+      (b) each signature line contains an original signature, and
+      <br><br>
+      (c) I have no reason to believe any signature is not that of the identified incorporator.
     </ConfirmCompletion>
 
     <!-- Certify -->
     <section
+      v-if="showCompPartyChanges"
       id="certify-section"
       class="mt-10"
     >
@@ -201,12 +221,85 @@
       >
         <Certify
           class="py-8 px-6"
-          :class="{ 'invalid-section': isCertifyInvalid }"
+          :class="{ 'invalid-section': isCertifyInvalid, 'prevent-red-title': isBaseCompany }"
           :disableEdit="isEntityCoop && !IsAuthorized(AuthorizedActions.EDITABLE_CERTIFY_NAME)"
           :invalidSection="isCertifyInvalid"
           :isStaff="IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)"
           :showLegalName="!isBaseCompany"
-        />
+        >
+          <template
+            v-if="!isEntityCoop && IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)"
+            #checkbox-label
+          >
+            <p
+              class="ma-0"
+              :style="{ 'font-size': '0.875rem' }"
+            >
+              {{ completingParty || '[Completing Party]' }}
+              certifies that the information provided is correct and that
+              they are authorized to submit this filing on behalf of the
+              {{ getEntityDescription }}.
+            </p>
+          </template>
+        </Certify>
+      </v-card>
+    </section>
+    <!-- NOTE: below will be removed shortly -->
+    <section
+      v-else
+      id="certify-section"
+      class="mt-10"
+    >
+      <header>
+        <h2>Certify</h2>
+        <p class="mt-4">
+          Confirm the legal name of the person authorized to complete and submit this application.
+        </p>
+      </header>
+
+      <v-card
+        flat
+        class="mt-6"
+      >
+        <Certify
+          class="py-8 px-6"
+          :class="{ 'invalid-section': isCertifyInvalid }"
+          :disableEdit="isEntityCoop && !IsAuthorized(AuthorizedActions.EDITABLE_CERTIFY_NAME)"
+          :invalidSection="isCertifyInvalid"
+          :isStaff="IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)"
+        >
+          <template v-if="!isEntityCoop" #checkbox-label>
+            <p
+              class="ma-0"
+              style="font-size: 0.875rem;"
+            >
+              I, <strong>{{ getCertifyState.certifiedBy || "[Legal Name]" }}</strong>, certify that I have relevant
+              knowledge of the {{ getCompletingPartyStatement.entityDisplay || 'business' }}
+              and I am authorized to make this filing.
+              <ul class="ml-n2 pt-2">
+                <li
+                  v-if="getEntityType === 'BEN'"
+                  class="pt-2"
+                >
+                  The Company Articles and the Incorporation Agreement both contain a signature
+                  line for each person identified as an incorporator in the Incorporation Application
+                  with the name of that person set out legibly under the signature line,
+                </li>
+                <li class="pt-2">
+                  An original signature has been placed on each of those signature lines.
+                </li>
+                <li class="pt-2">
+                  I have no reason to believe that the signature placed on a
+                  signature line is not the signature of the person whose name is set out
+                  under that signature line.
+                </li>
+                <li class="pt-2">
+                  I have relevant knowledge of the company and that I am authorized to make this filing.
+                </li>
+              </ul>
+            </p>
+          </template>
+        </Certify>
       </v-card>
     </section>
 
@@ -265,9 +358,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Watch, Vue } from 'vue-property-decorator'
 import { Action, Getter } from 'pinia-class'
 import { useStore } from '@/store/store'
+import { CompletingPartyStatementIF, FormIF } from '@bcrs-shared-components/interfaces'
 import { ContactPointIF, CertifyIF, EffectiveDateTimeIF, IncorporationAgreementIF,
   ShareStructureIF, CourtOrderStepIF, DocumentDeliveryIF, ConfirmCompletionIF
 } from '@/interfaces'
@@ -286,7 +380,7 @@ import UploadMemorandumSummary from '@/components/Incorporation/UploadMemorandum
 import UploadRulesSummary from '@/components/Incorporation/UploadRulesSummary.vue'
 import { CorpTypeCd, GetCorpFullDescription } from '@bcrs-shared-components/corp-type-module'
 import StaffPayment from '@/components/common/StaffPayment.vue'
-import { IsAuthorized } from '@/utils'
+import { GetFeatureFlag, IsAuthorized } from '@/utils'
 
 @Component({
   components: {
@@ -321,6 +415,7 @@ export default class IncorporationReviewConfirm extends Vue {
   @Getter(useStore) getCertifyState!: CertifyIF
   @Getter(useStore) getConfirmCompletionState!: ConfirmCompletionIF
   @Getter(useStore) getCompanyDisplayName!: string
+  @Getter(useStore) getCompletingPartyStatement!: CompletingPartyStatementIF
   @Getter(useStore) getCourtOrderStep!: CourtOrderStepIF
   @Getter(useStore) getCreateShareStructureStep!: ShareStructureIF
   @Getter(useStore) getDocumentDelivery!: DocumentDeliveryIF
@@ -344,6 +439,14 @@ export default class IncorporationReviewConfirm extends Vue {
   @Action(useStore) setEffectiveDateTimeValid!: (x: boolean) => void
   @Action(useStore) setHasPlanOfArrangement!: (x: boolean) => void
   @Action(useStore) setIsFutureEffective!: (x: boolean) => void
+
+  @Watch('isCompPartyInvalid', { immediate: false })
+  private validateFields (): void {
+    this.$refs.completingPartyForm?.validate()
+  }
+
+  enteredCompletingParty = ''
+  $refs: { completingPartyForm: FormIF }
 
   /**
    * In case submitting the incorporation failed, we want to reset the validity of Certify.
@@ -375,7 +478,7 @@ export default class IncorporationReviewConfirm extends Vue {
   }
 
   get isCompPartyInvalid (): boolean {
-    return this.getValidateSteps && !this.getConfirmCompletionState.confirmed
+    return this.getValidateSteps && !(this.getConfirmCompletionState.confirmed && this.completingParty)
   }
 
   /** Is true when the Court Order conditions are not met. */
@@ -406,6 +509,18 @@ export default class IncorporationReviewConfirm extends Vue {
         'The name of the person submitting this filing will be displayed in ' +
         `the history of filings for this ${this.getEntityDescription}.`
       : 'Confirm the legal name of the person authorized to complete and submit this application.'
+  }
+
+  // FUTURE: #32780 map this to somewhere in the store and add it into the filing submission
+  get completingParty (): string {
+    return IsAuthorized(AuthorizedActions.THIRD_PARTY_CERTIFY_STMT)
+      ? this.enteredCompletingParty
+      : this.userFullName
+  }
+
+  get showCompPartyChanges (): boolean {
+    const enabledNewFeatures: string = GetFeatureFlag('enable-new-feature')
+    return enabledNewFeatures.includes('incorporationApplication-completingParty')
   }
 }
 </script>

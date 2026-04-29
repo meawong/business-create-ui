@@ -1,6 +1,6 @@
 <template>
   <CertifyShared
-    :certifiedBy="getCertifyState.certifiedBy"
+    :certifiedBy="getCertifiedBy"
     :currentDate="getCurrentDate"
     :disableEdit="disableEdit"
     :entityDisplay="getCompletingPartyStatement.entityDisplay || 'business'"
@@ -15,7 +15,12 @@
     :authorizationMode="authorizationMode"
     @update:certifiedBy="onCertifiedBy($event)"
     @update:isCertified="onIsCertified($event)"
-  />
+  >
+    <template #checkbox-label>
+      <!-- expose slot -->
+      <slot name="checkbox-label" />
+    </template>
+  </CertifyShared>
 </template>
 
 <script lang="ts">
@@ -39,6 +44,7 @@ export default class Certify extends Vue {
   @Prop({ default: 'certify' }) readonly authorizationMode!: 'confirm' | 'certify'
 
   @Getter(useStore) getCertifyState!: CertifyIF
+  @Getter(useStore) getCertifiedBy!: string
   @Getter(useStore) getCompletingPartyStatement!: CompletingPartyStatementIF
   @Getter(useStore) getCurrentDate!: string
 
